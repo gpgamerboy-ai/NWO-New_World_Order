@@ -464,3 +464,33 @@ class NWOCombatDamageEngine:
             "net_mind_damage": int(base_mind_hit),
             "survived": attrs["health"] > 0
         }
+
+# =================================================================================
+# MODULE 18: PSYCHOLOGICAL WARFARE & IDEOLOGICAL INDOCTRINATION
+# =================================================================================
+class NWOPsychologicalSubversionEngine:
+    def __init__(self, match_manager_ref):
+        self.match = match_manager_ref
+
+    def evaluate_mental_paralysis_state(self, piece_ref):
+        """Checks target Mind threshold constraints to enforce psychological paralysis blocks."""
+        attrs = piece_ref["attributes"]
+        
+        if attrs["mind"] <= 40:
+            print(f"🧠 [PARALYSIS ACTIVE] Piece {piece_ref['piece_id']} is suffering from acute paranoia. Movement frozen.")
+            return {"can_act": False, "status_flag": "PSYCHOLOGICAL_PARALYSIS"}
+            
+        return {"can_act": True, "status_flag": "MENTAL_STABILITY_INTACT"}
+
+    def execute_mass_indoctrination_sweep(self, caster_id, target_player_id, target_circle):
+        """Programmatically siphons ideological mass nodes from a compromised rival dynasty."""
+        caster_estate = self.match.family_estates[caster_id]
+        target_estate = self.match.family_estates[target_player_id]
+        
+        # Siphon exactly 25% of the local population pool away from the rival estate
+        siphoned_masses = int(target_estate["masses"] * 0.25)
+        target_estate["masses"] -= siphoned_masses
+        caster_estate["masses"] += siphoned_masses
+        
+        print(f"☀️ [INDOCTRINATION SUCCESS] Player {caster_id} hijacked {siphoned_masses} masses from Player {target_player_id} on Circle {target_circle}.")
+        return {"net_masses_shifted": siphoned_masses}
