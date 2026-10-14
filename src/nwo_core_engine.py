@@ -290,3 +290,54 @@ class NWOEconomicLedgerSystem:
             "credited": recipient_id,
             "net_received": final_delivery_amount
         }
+
+# =================================================================================
+# MODULE 14: GLOBAL CATASTROPHE RESOLUTION & ENGINE RESETS
+# =================================================================================
+class NWOCatastropheResolutionSystem:
+    def __init__(self, match_manager_ref, movement_engine_ref):
+        self.match = match_manager_ref
+        self.movement = movement_engine_ref
+        self.sea_level = 0
+
+    def execute_instant_shockwave(self, target_circle):
+        """Processes immediate topographical wreckage calculations across a continent ring."""
+        print(f"\n💥 [CRITICAL SHOCKWAVE] Processing Asteroid impact calculations for Circle {target_circle}...")
+        
+        for piece in self.match.birth_order_timeline:
+            if piece["current_circle"] == target_circle:
+                # Retrieve tile elevation metadata to factor cover bonuses
+                tile_meta = self.movement.get_tile_topography_data(target_circle, piece["tile_index"])
+                attrs = piece["attributes"]
+                
+                if tile_meta["topology"] == "LOWLAND_VALLEY":
+                    print(f"💀 Piece {piece['piece_id']} caught in valley basin. Maximum damage applied.")
+                    attrs["health"] = max(0, attrs["health"] - 80)
+                    attrs["mind"] = max(10, attrs["mind"] - 50)
+                else:
+                    print(f"⛰️ Piece {piece['piece_id']} protected by highland topography cover. Damage mitigated.")
+                    attrs["health"] = max(0, attrs["health"] - 30)
+                    attrs["mind"] = max(10, attrs["mind"] - 50)
+                    
+        return {"status": "SHOCKWAVE_RESOLVED", "circle_targeted": target_circle}
+
+    def process_exponential_flood_tick(self, target_circle, active_wave_cycle):
+        """Simulates real-time multi-cycle sea level rises, force-displacing pieces uphill."""
+        self.sea_level += (20 * active_wave_cycle)
+        print(f"\n🌊 [CLIMATE INFRASTRUCTURE RESET] Flood Wave {active_wave_cycle} rising. Sea level: {self.sea_level}%")
+        
+        for piece in self.match.birth_order_timeline:
+            if piece["current_circle"] == target_circle:
+                tile_meta = self.movement.get_tile_topography_data(target_circle, piece["tile_index"])
+                
+                # Check for valley submergence threshold limits
+                if tile_meta["topology"] == "LOWLAND_VALLEY" and self.sea_level > 35:
+                    print(f"⚠️ [EVACUATION REQUIRED] Piece {piece['piece_id']} valley tracks drowned. Moving piece uphill.")
+                    piece["tile_index"] = (piece["tile_index"] + 1) # Force spatial displacement
+                    piece["attributes"]["health"] = max(10, piece["attributes"]["health"] - 15)
+                    
+        if self.sea_level >= 100:
+            self.sea_level = 0 # Ocean parameters settle post total geographical reset
+            print("🌊 The Great Flood has completed its absolute environmental reset cycle.")
+            
+        return {"current_sea_level": self.sea_level}
