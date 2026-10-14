@@ -221,3 +221,36 @@ class NWOTragedyDeckMatrix:
             return {"tragedy_active": True, "event_launched": triggered_event, "severity_index": "CRITICAL"}
             
         return {"tragedy_active": False, "event_launched": None, "severity_index": "STABLE"}
+
+# =================================================================================
+# MODULE 12: THE TECHNOLOGICAL ERA CLOCK ENGINE
+# =================================================================================
+class NWOEraClockEngine:
+    def __init__(self, match_manager_ref):
+        self.match_manager = match_manager_ref
+        self.current_cycle = 1
+        self.active_era = "AGRARIAN_EPOCH"
+
+    def advance_global_era_clock(self, global_commandments):
+        """Advances the round cycle counter and processes macro paradigm shifts under the hood."""
+        self.current_cycle += 1
+        
+        # Determine the macro civilization tier based on the clock cycle counter
+        if self.current_cycle <= 5:
+            self.active_era = "AGRARIAN_EPOCH"
+        elif 5 < self.current_cycle <= 12:
+            self.active_era = "INDUSTRIAL_FORGE"
+        else:
+            self.active_era = "INFORMATION_TECHNOCRACY"
+            
+        print(f"\n⏳ [ERA CLOCK] Ticking into Cycle {self.current_cycle}. Current World State: {self.active_era}")
+        
+        # If the Information Technocracy hits and Eschata-Politics is Evil, spark labor revolts
+        eschata_slider = global_commandments.get("C12_Eschata_Politics", 0)
+        if self.active_era == "INFORMATION_TECHNOCRACY" and eschata_slider > 2:
+            print("🚨 [LABOR STRIKE] Automation has triggered massive working-class unrest on the outer rings!")
+            # Systemic fallout forces a 50% revenue deduction on Circle 1 raw material extraction nodes
+            for pid in self.match_manager.players:
+                self.match_manager.family_estates[pid]["masses"] = max(1000, int(self.match_manager.family_estates[pid]["masses"] * 0.90))
+                
+        return {"current_cycle": self.current_cycle, "active_era": self.active_era}
