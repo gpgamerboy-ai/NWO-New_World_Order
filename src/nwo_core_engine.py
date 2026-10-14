@@ -341,3 +341,38 @@ class NWOCatastropheResolutionSystem:
             print("🌊 The Great Flood has completed its absolute environmental reset cycle.")
             
         return {"current_sea_level": self.sea_level}
+
+# =================================================================================
+# MODULE 15: VISUAL HUD INTERFACE CONTROLLER
+# =================================================================================
+class NWOHUDVisualController:
+    def __init__(self, match_manager_ref):
+        self.match = match_manager_ref
+        self.interface_theme = "TACTICAL_DARK_CYBER"
+
+    def compile_screen_render_frame(self, target_player_id, localized_pulse_rating, current_sea_level):
+        estate_profile = self.match.family_estates.get(target_player_id, {"cash": 0, "masses": 0})
+        asset_panel = {"ui_cash_readout": f"${estate_profile['cash']}", "ui_masses_readout": f"{estate_profile['masses']} Citizens"}
+        
+        map_canvas_layer = {
+            "global_flood_water_mesh_opacity": 0.0 if current_sea_level == 0 else 0.65,
+            "render_lowlands_as_active": True if current_sea_level <= 35 else False,
+            "active_3d_viewport_mode": "STANDARD_MAP" if current_sea_level < 80 else "CRISIS_MIGRATION_GLOW"
+        }
+        
+        lineage_panel_items = []
+        for piece in self.match.birth_order_timeline:
+            piece_id = piece["piece_id"]
+            owner = piece["owner_id"]
+            attrs = piece["attributes"]
+            is_cloaked = piece.get("Metric_Concealment", False)
+            
+            if owner != target_player_id and is_cloaked:
+                lineage_panel_items.append({"piece_tag": piece_id, "coordinate": f"C{piece['current_circle']}_T{piece['tile_index']}", "owner_crest": f"Team_{owner}", "diagnostic_status": "HIDDEN_MASKED_BY_CLOAK"})
+            else:
+                lineage_panel_items.append({
+                    "piece_tag": piece_id, "coordinate": f"C{piece['current_circle']}_T{piece['tile_index']}", "owner_crest": f"Team_{owner}", "diagnostic_status": "RENDER_FULL_CLARITY",
+                    "bars": {"vitality": f"{attrs['age_vitality']}%", "health": f"{attrs['health']}%", "mind": f"{attrs['mind']}%", "spirit": f"{attrs['spirit']}%"}
+                })
+
+        return {"theme_configuration": self.interface_theme, "HUD_Zone_A_Assets": asset_panel, "HUD_Zone_B_Canvas": map_canvas_layer, "HUD_Zone_D_Lineage": lineage_panel_items}
