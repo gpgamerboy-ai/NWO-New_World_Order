@@ -376,3 +376,43 @@ class NWOHUDVisualController:
                 })
 
         return {"theme_configuration": self.interface_theme, "HUD_Zone_A_Assets": asset_panel, "HUD_Zone_B_Canvas": map_canvas_layer, "HUD_Zone_D_Lineage": lineage_panel_items}
+
+# =================================================================================
+# MODULE 16: THE BLESSING DECK CARD DATA LEDGER
+# =================================================================================
+class NWOBlessingDeckRegistry:
+    def __init__(self, match_manager_ref):
+        self.match = match_manager_ref
+        self.blessings = {
+            "Divine_Intervention": {"cash_cost": 0, "mass_cost": 0, "class": "RESPONSE_AURA"},
+            "Papal_Absolution": {"cash_cost": 0, "mass_cost": 2000, "class": "MACRO_ACTION"},
+            "Regulatory_Safeguard": {"cash_cost": 1500, "mass_cost": 0, "class": "PASIVE_SHIELD"}
+        }
+
+    def process_blessing_deployment(self, player_id, blessing_key, target_ref):
+        """Validates card constraints and applies positive trait overrides to character sheets."""
+        card = self.blessings.get(blessing_key)
+        if not card:
+            return {"status": "ERROR", "msg": "Card missing from master blessing database."}
+            
+        estate = self.match.family_estates[player_id]
+        if estate["cash"] < card["cash_cost"] or estate["masses"] < card["mass_cost"]:
+            return {"status": "REJECTED", "reason": "Insufficient religious or corporate capital."}
+            
+        # Deduct transaction resource costs
+        estate["cash"] -= card["cash_cost"]
+        estate["masses"] -= card["mass_cost"]
+        
+        # --- EXECUTE CARD REWARD MATRIX ROUTINES ---
+        if blessing_key == "Papal_Absolution":
+            print(f"🕊️ [PAPAL ABSOLUTION]: Cleansing spiritual metrics for Player {player_id}...")
+            for piece in self.match.birth_order_timeline:
+                if piece["owner_id"] == player_id or player_id in piece["owner_id"]:
+                    piece["attributes"]["spirit"] = 100 # Reset karma vector to absolute maximum
+                    
+        elif blessing_key == "Regulatory_Safeguard" and target_ref:
+            # Append a permanent sovereign protection modifier tag to the asset
+            target_ref["is_shielded_by_safeguard"] = True
+            print(f"🛡️ [SAFEGUARD LOCKED]: Asset coordinate is now immune to corporate piracy loops.")
+            
+        return {"status": "SUCCESSFUL_BLESSING_DEPLOYMENT", "remaining_vault": estate}
