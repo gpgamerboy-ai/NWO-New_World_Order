@@ -651,3 +651,50 @@ class NWOOccultSpellSystem:
                     print(f"✨ Spatial spell at node {coord_key} has completely evaporated.")
                     
         return piece_ref
+
+# =================================================================================
+# MODULE 22: DEEPFAKE HERESY & MASS MOBILIZATION ENGINE
+# =================================================================================
+class NWODisinformationMobilizationEngine:
+    def __init__(self, match_manager_ref):
+        self.match = match_manager_ref
+        # Track locked/rioting tiles globally
+        # Format: {(circle_num, tile_idx): turns_locked_int}
+        self.rioting_choke_points = {}
+
+    def deploy_deepfake_heresy_impact(self, target_piece_ref, global_commandments):
+        """Processes disinformation plots, calculating local mass radicalization and rioting spikes."""
+        attrs = target_piece_ref["attributes"]
+        circle = target_piece_ref["current_circle"]
+        tile = target_piece_ref["tile_index"]
+        piece_id = target_piece_ref["piece_id"]
+        
+        # Check if the universe's Veracity Mandate penalizes lying heavily
+        veracity_slider = global_commandments.get("C2_Veracity_Mandate", 0)
+        
+        # Run algorithmic mind saving check to see if the piece resists the fake
+        if attrs["mind"] > 45:
+            # Target's mental resilience holds; the plot fails to fully radicalize the masses
+            attrs["mind"] = max(10, attrs["mind"] - 20)
+            print(f"🛡️ [DEEPFAKE RESISTED] Piece {piece_id} defused the disinformation leak using mental attributes.")
+            return {"status": "PLOT_FAILED", "fallout": "Minor Mind strain applied."}
+            
+        # Plot Success: Radicalize local masses, locking the tile coordinate
+        coord_key = (circle, tile)
+        self.rioting_choke_points[coord_key] = 2 # Lock tile for 2 full cycles
+        attrs["mind"] = max(10, attrs["mind"] - 50)
+        
+        # Collapse regional reputation scores instantly
+        target_piece_ref["Social_Scores"][f"Circle_{circle}_Local"] = 0
+        
+        print(f"🚨 [MASS RIOT LOCKED] Deepfake successful! Angry mob has trapped piece {piece_id} on node {coord_key}.")
+        return {"status": "MOB_RIOT_TRIGGERED", "locked_node": coord_key, "target_mind_decay": attrs["mind"]}
+
+    def verify_tile_mobility_constraints(self, circle_num, tile_index):
+        """Intercepts the movement loop to verify if an angry mob is actively blocking transit."""
+        coord_key = (circle_num, tile_index)
+        if coord_key in self.rioting_choke_points:
+            if self.rioting_choke_points[coord_key] > 0:
+                print(f"🛑 [PATH LOCKED] Transit blocked! An angry mob is rioting on node {coord_key}.")
+                return False
+        return True
