@@ -494,3 +494,46 @@ class NWOPsychologicalSubversionEngine:
         
         print(f"☀️ [INDOCTRINATION SUCCESS] Player {caster_id} hijacked {siphoned_masses} masses from Player {target_player_id} on Circle {target_circle}.")
         return {"net_masses_shifted": siphoned_masses}
+
+# =================================================================================
+# MODULE 19: COUNTER-ESPIONAGE RADAR & INTELLIGENCE AUDITS
+# =================================================================================
+class NWOCounterEspionageRadar:
+    def __init__(self, shadow_stack_ref, match_manager_ref):
+        self.shadow_stack = shadow_stack_ref
+        self.match = match_manager_ref
+
+    def execute_ring_threat_audit(self, auditor_id, target_circle):
+        """Scans the hidden Shadow Stack backend queue, uncloaking plots targeting this ring."""
+        auditor_estate = self.match.family_estates[auditor_id]
+        if auditor_estate["cash"] < 1000:
+            return {"status": "REJECTED", "reason": "Insufficient corporate capital for radar probe."}
+            
+        auditor_estate["cash"] -= 1000
+        uncovered_plots_count = 0
+        exposed_data_briefs = []
+        
+        # Programmatically loop through the background stack array
+        for plot in self.shadow_stack.shadow_stack_queue:
+            if plot["circle_num"] == target_circle and not plot.get("is_exposed", False):
+                plot["is_exposed"] = True  # Tear away information masking filters
+                uncovered_plots_count += 1
+                exposed_data_briefs.append(plot)
+                print(f"📡 [RADAR EXPOSE] Secret trap ID {plot['plot_id']} successfully uncloaked on Circle {target_circle}!")
+                
+        return {
+            "status": "AUDIT_RESOLVED",
+            "plots_uncovered": uncovered_plots_count,
+            "briefs": exposed_data_briefs,
+            "remaining_cash": auditor_estate["cash"]
+        }
+
+    def pierce_metric_concealment(self, target_piece_ref):
+        """Breaks biological data cloaking meshes to force-render true core metrics."""
+        if target_piece_ref.get("Metric_Concealment", False):
+            # De-cloak the encryption flags on the target character sheet data array
+            target_piece_ref["Metric_Concealment"] = False
+            print(f"👁️ [DE-CLOAKED] Biometric signature for piece {target_piece_ref['piece_id']} broken. Metrics exposed.")
+            return {"decryption_status": "SUCCESSFUL_PENETRATION", "true_attributes": target_piece_ref["attributes"]}
+            
+        return {"decryption_status": "TARGET_WAS_ALREADY_VISIBLE", "true_attributes": target_piece_ref["attributes"]}
