@@ -416,3 +416,51 @@ class NWOBlessingDeckRegistry:
             print(f"🛡️ [SAFEGUARD LOCKED]: Asset coordinate is now immune to corporate piracy loops.")
             
         return {"status": "SUCCESSFUL_BLESSING_DEPLOYMENT", "remaining_vault": estate}
+
+# =================================================================================
+# MODULE 17: COMBAT DAMAGE ALLOCATION & TOPOGRAPHICAL ARMOR
+# =================================================================================
+class NWOCombatDamageEngine:
+    def __init__(self, movement_engine_ref):
+        self.movement = movement_engine_ref
+
+    def calculate_mitigated_combat_damage(self, attacker_type, target_piece_ref):
+        """Processes kinetic hits, scaling damage against tile elevation profiles."""
+        attrs = target_piece_ref["attributes"]
+        circle = target_piece_ref["current_circle"]
+        tile = target_piece_ref["tile_index"]
+        
+        # Pull layout metadata for target coordinates
+        tile_meta = self.movement.get_tile_topography_data(circle, tile)
+        topology_type = tile_meta["topology"]
+        
+        base_health_hit = 0
+        base_mind_hit = 0
+        
+        # --- EXECUTE DAMAGE SCALING CALCULATION LOOPS ---
+        if attacker_type == "DRONE_STRIKE":
+            if topology_type == "LOWLAND_VALLEY":
+                base_health_hit = 50 * 1.0
+                base_mind_hit = 20
+            else: # HIGHLAND_RIDGE
+                base_health_hit = 50 * 0.4
+                base_mind_hit = 10
+                
+        elif attacker_type == "KAMIKAZE_ZEALOT":
+            if topology_type == "LOWLAND_VALLEY":
+                base_health_hit = 100 # Immediate liquidation
+                base_mind_hit = 100
+            else: # HIGHLAND_RIDGE
+                base_health_hit = 40
+                base_mind_hit = 60
+                
+        # Deduct damage values from character sheet attribute arrays
+        attrs["health"] = max(0, attrs["health"] - int(base_health_hit))
+        attrs["mind"] = max(10, attrs["mind"] - int(base_mind_hit))
+        
+        return {
+            "piece_id": target_piece_ref["piece_id"],
+            "net_health_damage": int(base_health_hit),
+            "net_mind_damage": int(base_mind_hit),
+            "survived": attrs["health"] > 0
+        }
