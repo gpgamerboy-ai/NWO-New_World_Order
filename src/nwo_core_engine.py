@@ -537,3 +537,67 @@ class NWOCounterEspionageRadar:
             return {"decryption_status": "SUCCESSFUL_PENETRATION", "true_attributes": target_piece_ref["attributes"]}
             
         return {"decryption_status": "TARGET_WAS_ALREADY_VISIBLE", "true_attributes": target_piece_ref["attributes"]}
+
+# =================================================================================
+# MODULE 20: GENERATIONAL INHERITANCE & LEGACY SUCCESSION MATRIX
+# =================================================================================
+class NWOLegacySuccessionEngine:
+    def __init__(self, match_manager_ref, land_ledger_ref):
+        self.match = match_manager_ref
+        self.ledger = land_ledger_ref
+
+    def execute_dynastic_succession(self, deceased_piece_ref, player_id):
+        """
+        Runs asset reallocation routines when an heir piece hits 0% Health or Vitality.
+        Safely migrates cash, property records, and ancestral curses to surviving bloodlines.
+        """
+        timeline = self.match.birth_order_timeline
+        piece_id = deceased_piece_ref["piece_id"]
+        attrs = deceased_piece_ref["attributes"]
+        
+        print(f"💀 [DEATH DETECTED] Token {piece_id} has been wiped from the timeline. Activating succession...")
+
+        # Find the oldest living heir matching this specific player team code
+        oldest_surviving_heir = None
+        for piece in timeline:
+            if piece["owner_id"] == player_id and piece["piece_id"] != piece_id:
+                oldest_surviving_heir = piece
+                break # First match is naturally the oldest due to biological turn sequence sorting
+
+        # --- PHASE A: WIRE LIQUID ASSETS TO MAIN ESTATE VAULT ---
+        # Any remaining cash assets pocketed by this piece roll up to the primary account
+        self.match.family_estates[player_id]["cash"] += 500 # Simulate pocket inheritance allocation
+
+        # --- PHASE B: MIGRATE PROPERTY MONOPOLIES ---
+        migrated_deeds_count = 0
+        if self.ledger and hasattr(self.ledger, 'spreadsheet_deeds'):
+            for deed_id, details in self.ledger.spreadsheet_deeds.items():
+                if details["owner"] == piece_id:
+                    if oldest_surviving_heir:
+                        # Re-route deed ownership flag to the oldest active heir piece
+                        details["owner"] = oldest_surviving_heir["piece_id"]
+                    else:
+                        # No heirs left living: release deeds back to unowned market pool
+                        details["owner"] = None
+                    migrated_deeds_count += 1
+
+        # --- PHASE C: GENETIC CURSE TRANSFER MATRIX ---
+        # Check if deceased piece held an unrevealed Ancestral Taint or genetic defect
+        has_taint = "Ancestral Taint Defect" in deceased_piece_ref.get("traits", [])
+        if has_taint and oldest_surviving_heir:
+            print(f"🩸 [CURSE TRANSFER] Ancestral Taint skips down the timeline onto {oldest_surviving_heir['piece_id']}!")
+            if "traits" not in oldest_surviving_heir:
+                oldest_surviving_heir["traits"] = []
+            oldest_surviving_heir["traits"].append("Ancestral Taint Defect")
+            oldest_surviving_heir["attributes"]["spirit"] = max(5, oldest_surviving_heir["attributes"]["spirit"] - 30)
+
+        # --- PHASE D: LIQUIDATE AND EXPUNGE FROM TIMELINE ---
+        if deceased_piece_ref in timeline:
+            timeline.remove(deceased_piece_ref)
+            
+        return {
+            "status": "SUCCESSRES_RESOLVED",
+            "deceased": piece_id,
+            "successor_found": oldest_surviving_heir["piece_id"] if oldest_surviving_heir else None,
+            "deeds_transferred": migrated_deeds_count
+        }
