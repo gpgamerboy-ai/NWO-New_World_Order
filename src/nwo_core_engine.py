@@ -194,3 +194,30 @@ class NWOBlesingDeckMatrix:
         
         # Standard baseline roll threshold calculation
         return {"draw_success": random.choice([True, False]), "drawn_card": "Regulatory_Safeguard", "luck_modifier": 1.0}
+
+# =================================================================================
+# MODULE 11: THE TRAGEDY DECK GENERATOR
+# =================================================================================
+class NWOTragedyDeckMatrix:
+    def __init__(self, match_manager_ref):
+        self.match_manager = match_manager_ref
+        self.tragedy_pool = ["Hyperinflation_Collapse", "Inherited_Curse", "Bank_Audit_Freeze"]
+
+    def evaluate_tragedy_trigger(self, piece_ref, global_commandments):
+        """Programmatically scans active parameters to force-inject a Tragedy event."""
+        attrs = piece_ref["attributes"]
+        harm_slider = global_commandments.get("C3_Harm_Mandate", 0)
+        
+        # If a family's Spirit collapses or the universe is highly predatory, risk spikes
+        if attrs["spirit"] < 25 or harm_slider > 3:
+            triggered_event = random.choice(self.tragedy_pool)
+            
+            if triggered_event == "Inherited_Curse":
+                # Inject the severe physical defect directly into the token metadata
+                piece_ref["traits"].append("Fragile Heir / -2 Move Modifier")
+                attrs["health"] = 70
+                attrs["mind"] = 70
+                
+            return {"tragedy_active": True, "event_launched": triggered_event, "severity_index": "CRITICAL"}
+            
+        return {"tragedy_active": False, "event_launched": None, "severity_index": "STABLE"}
