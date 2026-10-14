@@ -174,3 +174,23 @@ if __name__ == "__main__":
     active_heir = match.birth_order_timeline[0]
     move_receipt = movement.execute_piece_movement(active_heir, dice_roll=4, preferred_fork="HIGHLAND_RIDGE")
     print(f"Test Run Success: Piece {move_receipt['piece_id']} advanced to {move_receipt['landed_coordinate']}.")
+
+# =================================================================================
+# MODULE 10: THE BLESSING DECK GENERATOR
+# =================================================================================
+class NWOBlesingDeckMatrix:
+    def __init__(self, commandments_engine_ref):
+        self.physics = commandments_engine_ref
+        self.blessing_pool = ["Divine_Intervention", "Papal_Absolution", "Regulatory_Safeguard"]
+
+    def evaluate_blessing_draw_chance(self, piece_spirit_attribute):
+        """Calculates draw modifiers based on individual piece Spirit integrity."""
+        if piece_spirit_attribute > 85:
+            # High spiritual health unlocks supreme baseline blessing probabilities
+            return {"draw_success": True, "drawn_card": random.choice(self.blessing_pool), "luck_modifier": 1.5}
+        elif piece_spirit_attribute < 30:
+            # Corrupted lineage lines are algorithmically locked out of the Blessing deck
+            return {"draw_success": False, "drawn_card": None, "luck_modifier": 0.5}
+        
+        # Standard baseline roll threshold calculation
+        return {"draw_success": random.choice([True, False]), "drawn_card": "Regulatory_Safeguard", "luck_modifier": 1.0}
