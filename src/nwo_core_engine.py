@@ -254,3 +254,39 @@ class NWOEraClockEngine:
                 self.match_manager.family_estates[pid]["masses"] = max(1000, int(self.match_manager.family_estates[pid]["masses"] * 0.90))
                 
         return {"current_cycle": self.current_cycle, "active_era": self.active_era}
+
+# =================================================================================
+# MODULE 13: MACRO ECONOMIC TRADE & ASSET LEDGER
+# =================================================================================
+class NWOEconomicLedgerSystem:
+    def __init__(self, match_manager_ref):
+        self.match = match_manager_ref
+
+    def execute_private_wire_transfer(self, sender_id, recipient_id, transfer_amount, global_commandments):
+        """Processes peer-to-peer asset transfers, calculating structural compliance taxes."""
+        sender_vault = self.match.family_estates[sender_id]
+        recipient_vault = self.match.family_estates[recipient_id]
+        
+        if sender_vault["cash"] < transfer_amount:
+            return {"status": "REJECTED", "reason": "Insufficient capital inside sender vault."}
+            
+        # Deduct starting base payload
+        sender_vault["cash"] -= transfer_amount
+        
+        # Evaluate compliance tax based on Commandment 8 (Asset Mandate)
+        asset_slider = global_commandments.get("C8_Asset_Mandate", 0)
+        final_delivery_amount = transfer_amount
+        
+        if asset_slider < 0:
+            # Universe enforces Sacred Stewardship: apply strict financial regulation tax
+            tax_deduction = int(transfer_amount * 0.15)
+            final_delivery_amount -= tax_deduction
+            print(f"[BANK REGULATION] A 15% compliance tax (${tax_deduction}) was siphoned into global reserves.")
+            
+        recipient_vault["cash"] += final_delivery_amount
+        return {
+            "status": "TRANSFER_COMPLETE",
+            "debited": sender_id,
+            "credited": recipient_id,
+            "net_received": final_delivery_amount
+        }
