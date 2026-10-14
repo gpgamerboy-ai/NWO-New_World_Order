@@ -601,3 +601,53 @@ class NWOLegacySuccessionEngine:
             "successor_found": oldest_surviving_heir["piece_id"] if oldest_surviving_heir else None,
             "deeds_transferred": migrated_deeds_count
         }
+
+# =================================================================================
+# MODULE 21: OCCULT HEX & CONTINENT RING SPELL MATRIX
+# =================================================================================
+class NWOOccultSpellSystem:
+    def __init__(self, match_manager_ref):
+        self.match = match_manager_ref
+        # Registry tracking active ring enchantments globally
+        # Format: {(circle_num, tile_idx): {"spell_type": str, "caster": str, "duration": int}}
+        self.active_spatial_spells = {}
+
+    def deploy_tile_enchantment(self, caster_id, spell_type, circle_num, tile_index, duration_turns=3):
+        """Anchors a physical AoE ward or curse directly onto a 3D grid coordinate."""
+        estate = self.match.family_estates[caster_id]
+        mass_cost = 800 if spell_type == "OCCULT_HEX" else 1200
+        
+        if estate["masses"] < mass_cost:
+            return {"status": "REJECTED", "reason": "Insufficient religious masses infrastructure capital."}
+            
+        estate["masses"] -= mass_cost
+        coord_key = (circle_num, tile_index)
+        
+        self.active_spatial_spells[coord_key] = {
+            "spell_type": spell_type,
+            "caster_id": caster_id,
+            "turns_remaining": duration_turns
+        }
+        print(f"🔮 [SPELL ANCHORED] '{spell_type}' locked onto node Circle {circle_num}_Tile {tile_index} by Player {caster_id}.")
+        return {"status": "SUCCESSFUL_ENCHANTMENT", "coordinate": coord_key}
+
+    def evaluate_tile_entry_spell_triggers(self, piece_ref, roll_data_ref):
+        """Intercepts movement telemetry to apply movement or attribute debuffs on enchanted tiles."""
+        coord_key = (piece_ref["current_circle"], piece_ref["tile_index"])
+        
+        if coord_key in self.active_spatial_spells:
+            spell = self.active_spatial_spells[coord_key]
+            if spell["turns_remaining"] > 0 and spell["caster_id"] != piece_ref["active_controller"]:
+                
+                if spell["spell_type"] == "OCCULT_HEX":
+                    print(f"🕸️ [HEX TRIGGERED] Piece {piece_ref['piece_id']} stumbled into an active Occult Hex basin!")
+                    # Insubordination movement penalty: clamp the remaining dice step velocity
+                    roll_data_ref["dice_roll"] = max(1, roll_data_ref["dice_roll"] // 2)
+                    piece_ref["attributes"]["mind"] = max(10, piece_ref["attributes"]["mind"] - 20)
+                    
+                spell["turns_remaining"] -= 1
+                if spell["turns_remaining"] <= 0:
+                    del self.active_spatial_spells[coord_key] # Dissipate matrix aura
+                    print(f"✨ Spatial spell at node {coord_key} has completely evaporated.")
+                    
+        return piece_ref
